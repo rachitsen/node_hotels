@@ -60,7 +60,6 @@ fs.appendFile('greeting.txt','Hi ' + os.userInfo().username + '!\n', ()=>{consol
 
 //================================================================================
 
-
 // ||||||||== <<...  Leaning How to import modules..>> ===||||||||||||
 
 /*
@@ -71,7 +70,6 @@ console.log(note.num);
 console.log(note.add())
 
 */
-
 
 //=========================================================================================
 
@@ -92,26 +90,22 @@ console.log(typeof jsonewestr);   // converting obj to string(JSON)
 
 */
 
-
 // ||||||||== <<...  Creating API or Server using express package ....>> ===||||||||||||
 
-
-const express = require('express');
+const express = require("express");
 const app = express();
-const db = require('./db');
+const db = require("./db");
+require("dotenv").config();
 
-const bodyParser = require('body-parser');
+const port = process.env.PORT || 3000;
+const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+const menuItem = require("./models/menu.js");
 
-const menuItem = require('./models/menu.js')
-
-
-app.get('/', function(req,res){
+app.get("/", function (req, res) {
   res.send("This Is your Hotel");
-})
-
-
+});
 
 //OLD TECHNIQUE
 
@@ -131,14 +125,13 @@ app.get('/', function(req,res){
 //    })
 // })
 
+const personRoutes = require("./routes/personRoutes");
+app.use("/person", personRoutes);
 
-
-const personRoutes = require('./routes/personRoutes');
-app.use('/person',personRoutes);
-
-const menuRoutes = require('./routes/menuRoutes');
-app.use('/menuitem',menuRoutes);
-app.listen(3000,()=>{console.log("Server is listening at 3000")});
-
+const menuRoutes = require("./routes/menuRoutes");
+app.use("/menuitem", menuRoutes);
+app.listen(port, () => {
+  console.log("Server is listening at 3000");
+});
 
 //===========================================================================================
