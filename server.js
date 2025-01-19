@@ -96,19 +96,42 @@ const express = require("express");
 const app = express();
 const db = require("./db");
 require("dotenv").config();
-
+const passport = require("./auth");
 const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-const menuItem = require("./models/menu.js");
+// creating Middlewear
 
-app.get("/", function (req, res) {
+const logRequest = (req, res, next) => {
+  console.log(
+    `[${new Date().toLocaleString()}] Request made to: ${req.originalUrl}`
+  );
+  next();
+};
+//calling Middlewear for each requests
+app.use(logRequest);
+
+app.use(passport.initialize());
+const localAuthMiddlewear = passport.authenticate("local", { session: false });
+
+app.get("/", localAuthMiddlewear, function (req, res) {
   res.send("This Is your Hotel");
 });
 
-//OLD TECHNIQUE
+const personRoutes = require("./routes/personRoutes");
+app.use("/person", localAuthMiddlewear, personRoutes);
 
+const menuRoutes = require("./routes/menuRoutes");
+app.use("/menuitem", menuRoutes);
+
+app.listen(port, () => {
+  console.log("Server is listening at 3000");
+});
+
+//===========================================================================================
+
+// old technique
 // app.post('/person', (req,res)=>{
 //    const data = req.body;
 
@@ -124,14 +147,3 @@ app.get("/", function (req, res) {
 //     }
 //    })
 // })
-
-const personRoutes = require("./routes/personRoutes");
-app.use("/person", personRoutes);
-
-const menuRoutes = require("./routes/menuRoutes");
-app.use("/menuitem", menuRoutes);
-app.listen(port, () => {
-  console.log("Server is listening at 3000");
-});
-
-//===========================================================================================
